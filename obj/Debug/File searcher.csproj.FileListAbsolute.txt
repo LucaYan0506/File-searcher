@@ -1,0 +1,10 @@
+D:\School\IT\C#\File searcher\bin\Debug\File searcher.exe.config
+D:\School\IT\C#\File searcher\bin\Debug\File searcher.exe
+D:\School\IT\C#\File searcher\bin\Debug\File searcher.pdb
+D:\School\IT\C#\File searcher\obj\Debug\File searcher.csproj.AssemblyReference.cache
+D:\School\IT\C#\File searcher\obj\Debug\File_searcher.Form1.resources
+D:\School\IT\C#\File searcher\obj\Debug\File_searcher.Properties.Resources.resources
+D:\School\IT\C#\File searcher\obj\Debug\File searcher.csproj.GenerateResource.cache
+D:\School\IT\C#\File searcher\obj\Debug\File searcher.csproj.CoreCompileInputs.cache
+D:\School\IT\C#\File searcher\obj\Debug\File searcher.exe
+D:\School\IT\C#\File searcher\obj\Debug\File searcher.pdb
