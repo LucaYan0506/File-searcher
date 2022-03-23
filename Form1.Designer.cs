@@ -29,7 +29,6 @@ namespace File_searcher
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.directoryLbl = new System.Windows.Forms.Label();
             this.directoryCombobox = new System.Windows.Forms.ComboBox();
             this.open_folder_browserBtn = new System.Windows.Forms.Button();
@@ -40,7 +39,7 @@ namespace File_searcher
             this.searching_progressLbl = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.files_ListBox = new System.Windows.Forms.ListBox();
-            this.Press_esc_timer = new System.Windows.Forms.Timer(this.components);
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // directoryLbl
@@ -135,10 +134,12 @@ namespace File_searcher
             this.files_ListBox.TabIndex = 7;
             this.files_ListBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.files_ListBox_MouseDoubleClick);
             // 
-            // Press_esc_timer
+            // backgroundWorker1
             // 
-            this.Press_esc_timer.Interval = 1000;
-            this.Press_esc_timer.Tick += new System.EventHandler(this.timer1_Tick);
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
             // Form1
             // 
@@ -175,7 +176,7 @@ namespace File_searcher
         private System.Windows.Forms.Label searching_progressLbl;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.ListBox files_ListBox;
-        private System.Windows.Forms.Timer Press_esc_timer;
+        public System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

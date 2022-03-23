@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Threading;
 
 namespace File_searcher
 {
@@ -26,7 +27,14 @@ namespace File_searcher
         //////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////
-        /*                                 Functions/subroutines                            */
+        /*                                 Functions/subroutines/struct                            */
+
+        struct DataParameter{
+            public string path;
+            public string file_name;
+
+        }
+
         private List<DirectoryInfo> get_all_directories(DirectoryInfo directory)
         {
             List<DirectoryInfo> all_directories = new List<DirectoryInfo>();
@@ -71,7 +79,6 @@ namespace File_searcher
             {
                 if (file.Name.Contains(filename))
                 {
-                    files_ListBox.Items.Add(file.Name);
                     file_list.Add(file.FullName);
                 }
             }
@@ -100,82 +107,46 @@ namespace File_searcher
 
         private void searchBtn_Click(object sender, EventArgs e)
         {
-
-            //try to get the directory and subdirectory from the path given by the user
-            string path = directoryCombobox.Text;
-            DirectoryInfo directory;
-            List<DirectoryInfo> all_directories = new List<DirectoryInfo>();
-            //reset progress bar to 0
-            progressBar1.Value = 0;
-
-            //show the progress (not accurate, it is used to let user know that the app is not frozen, it is searching all sub directories)
-            searching_progressLbl.Text = "Searching folders";
-            progressBar1.Value = 50;
-            
-            //close the next message autotically after 1s
-            Press_esc_timer.Enabled = true;
-            Press_esc_timer.Start();
-
-            //pop up the message to tell the user that the searching is started
-            MessageBox.Show("Started to searching, please wait", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
-
-            try
+            if (!backgroundWorker1.IsBusy)
             {
-                //get the directory info
-                directory = new DirectoryInfo(path);
-                //get all sub directories
-                all_directories = get_all_directories(directory);
+                //clear listbox
+                files_ListBox.Items.Clear();
 
-                //all sub directories found
-                progressBar1.Value = 100;
-            }
-            catch (Exception error)
-            {
-                //reset progress bar to 0
-                progressBar1.Value = 0;
-                MessageBox.Show(error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            //reset to the progress to default (0)
-            searching_progressLbl.Text = "Searching...0%";
-            progressBar1.Value = 0;
+                //add path and file name to the parameters (so backgroundWorker1 can access these data)
+                DataParameter parameters = new DataParameter();
+                parameters.path = directoryCombobox.Text;
+                parameters.file_name = file_nameTxt.Text;
 
-            //clear listbox
-            files_ListBox.Items.Clear();
-
-            //clear file_list
-            file_list.Clear();
-
-            //Use those variables to show the percentage of searching done
-            int directory_completed = 0;
-            int progress_percentage = directory_completed / all_directories.Count * 100;
-
-            //search files from directory (path given by the user)
-            search_files(directory, file_nameTxt.Text);
-
-            //search all directories found
-            foreach (DirectoryInfo sub in all_directories)
-            {
-                //search
-                search_files(sub, file_nameTxt.Text);
-
-                //searching for sub done, so directory_completed + 1
-                directory_completed++;
-
-                //update the progress
-                progress_percentage = directory_completed * 100 / all_directories.Count ;
-                searching_progressLbl.Text = "Searching..." + progress_percentage + "%";
-                progressBar1.Value = progress_percentage;
+                //run backgroundWorker1
+                backgroundWorker1.RunWorkerAsync(parameters);
             }
 
-            //searching complete
-            searching_progressLbl.Text = "Done";
+            //add the directory path into the combobox as "history" only when this path in not in the "History"
+            foreach (string item in directoryCombobox.Items)
+                if (item == directoryCombobox.Text)
+                    return;
 
-            //add the directory path into the combobox as "history"
-            directoryCombobox.Items.Add(directoryCombobox.Text);
+            //lines of code below won't run if directory.text is already in the combobox.items
+
+            if (directoryCombobox.Items.Count > 0)
+            {
+                //if last item is clear remove it for now 
+                string last_item = directoryCombobox.Items[directoryCombobox.Items.Count - 1].ToString();
+                if (last_item == "Clear")
+                    directoryCombobox.Items.Remove(last_item);
+
+                //add new item
+                directoryCombobox.Items.Add(directoryCombobox.Text);
+                //add back "clear"
+                directoryCombobox.Items.Add(last_item);
+            }
+            else
+            {
+                //add new item
+                directoryCombobox.Items.Add(directoryCombobox.Text);
+            }
+          
         }
-
 
         private void files_ListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -209,12 +180,10 @@ namespace File_searcher
 
                     if (directoryCombobox.Items.Count > 0 && directoryCombobox.Items[directoryCombobox.Items.Count - 1].ToString() != "Clear")
                         directoryCombobox.Items.Add("Clear");
-
                 }
             }
           
         }
-
 
         private void directoryCombobox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -228,12 +197,81 @@ namespace File_searcher
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            SendKeys.SendWait("{ESC}");
+            searching_progressLbl.Text = string.Format("Searching...{0}%", e.ProgressPercentage);
+            progressBar1.Value = e.ProgressPercentage;
+        }
 
-            Press_esc_timer.Stop();
-            Press_esc_timer.Enabled = false;
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            //reset progress bar to 0
+            backgroundWorker1.ReportProgress(0);
+
+            //try to get the directory and subdirectory from the path given by the user
+            string path = ((DataParameter)e.Argument).path;
+            DirectoryInfo directory;
+            List<DirectoryInfo> all_subDirectories = new List<DirectoryInfo>();
+            try
+            {
+                //get the directory info
+                directory = new DirectoryInfo(path);
+                //get all sub directories
+                all_subDirectories = get_all_directories(directory);
+
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show(error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            //reset to the progress to default (0)
+            backgroundWorker1.ReportProgress(0);
+
+            //clear file_list
+            file_list.Clear();
+
+            //search files from directory (path given by the user)
+            search_files(directory, ((DataParameter)e.Argument).file_name);
+
+            //if there isn't any subdirectory set the progress to 100
+            if (all_subDirectories.Count == 0)
+            {
+                backgroundWorker1.ReportProgress(100);
+                return;
+            }
+
+            //Following code will run only if there are some subdirecotories;
+
+            //Use those variables to show the percentage of searching done
+            int directory_completed = 0;
+            int progress_percentage = directory_completed / all_subDirectories.Count * 100;
+
+            //search all directories found
+            foreach (DirectoryInfo sub in all_subDirectories)
+            {
+                //search
+                search_files(sub, ((DataParameter)e.Argument).file_name);
+
+                //searching for sub done, so directory_completed + 1
+                directory_completed++;
+
+                //update the progress
+                progress_percentage = directory_completed * 100 / all_subDirectories.Count;
+                backgroundWorker1.ReportProgress(progress_percentage);
+            }
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //searching complete
+            searching_progressLbl.Text = "Done";
+
+            foreach (string file in file_list){
+                files_ListBox.Items.Add(file.Substring(file.LastIndexOf("\\") + 1));
+            }
+
         }
     }
 }
