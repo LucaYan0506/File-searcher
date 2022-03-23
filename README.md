@@ -37,7 +37,7 @@ after click yes it should looks like this
 Here you can add the directory path (compulsory) and the file name (optional, if you don't insert the file name it will show all files in that folder path)  
 To select the folder path you can also click the 3 points   
 ![image](https://user-images.githubusercontent.com/83918638/159766153-4b626265-dc73-428e-b2d4-de9bd5558708.png)   
-then select the folder you want and then click search to seach files  
+then select the folder you want and then click search to search files  
 ![image](https://user-images.githubusercontent.com/83918638/159766235-66c000e7-3db5-4472-bac8-fea1abafc330.png)  
 Once the search is done you can double click one of these files to open it  
 ![image](https://user-images.githubusercontent.com/83918638/159766436-a26b699b-d55b-461b-bb7d-dde5a2409ae1.png)
