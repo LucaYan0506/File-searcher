@@ -29,6 +29,7 @@ namespace File_searcher
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.directoryLbl = new System.Windows.Forms.Label();
             this.directoryCombobox = new System.Windows.Forms.ComboBox();
             this.open_folder_browserBtn = new System.Windows.Forms.Button();
@@ -155,8 +156,12 @@ namespace File_searcher
             this.Controls.Add(this.directoryCombobox);
             this.Controls.Add(this.file_nameLbl);
             this.Controls.Add(this.directoryLbl);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "File Searcher";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
