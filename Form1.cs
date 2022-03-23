@@ -77,7 +77,7 @@ namespace File_searcher
             FileInfo[] all_files = directory.GetFiles();
             foreach (FileInfo file in all_files)
             {
-                if (file.Name.Contains(filename))
+                if (file.Name.ToLower().Contains(filename.ToLower()))
                 {
                     file_list.Add(file.FullName);
                 }
@@ -115,7 +115,7 @@ namespace File_searcher
                 //add path and file name to the parameters (so backgroundWorker1 can access these data)
                 DataParameter parameters = new DataParameter();
                 parameters.path = directoryCombobox.Text;
-                parameters.file_name = file_nameTxt.Text;
+                parameters.file_name = file_nameTxt.Text.ToLower();
 
                 //run backgroundWorker1
                 backgroundWorker1.RunWorkerAsync(parameters);
@@ -272,6 +272,8 @@ namespace File_searcher
                 files_ListBox.Items.Add(file.Substring(file.LastIndexOf("\\") + 1));
             }
 
+            if (file_list.Count == 0)
+                MessageBox.Show("No files found", "Result",MessageBoxButtons.OK,MessageBoxIcon.Information);
         }
     }
 }
